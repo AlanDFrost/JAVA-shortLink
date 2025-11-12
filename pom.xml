@@ -5,6 +5,7 @@
     <groupId>org.myprject.shortlink</groupId>
     <artifactId>shotlink-all</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>shotlink-all</name>
     <description>shotlink-all</description>
 
