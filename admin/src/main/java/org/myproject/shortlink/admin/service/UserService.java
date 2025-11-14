@@ -16,4 +16,9 @@ public interface UserService extends IService<UserDO> {
     * @return： 用户返回实体
     */
     UserRespDTO getUserByUsername(String username);
+
+    /*
+    查询用户名是否已存在（已存在=不可用，不存在=可用）
+     */
+    Boolean hasUserName(String username);
 }

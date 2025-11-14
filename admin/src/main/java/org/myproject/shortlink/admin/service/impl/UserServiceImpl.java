@@ -13,7 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 /*
-* 用户接口实现曾
+* 用户接口实现层
 * */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements UserService {
@@ -26,5 +26,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         UserRespDTO result = new UserRespDTO();
         BeanUtils.copyProperties(userDO, result);
         return result;
+    }
+
+    @Override
+    public Boolean hasUserName(String username) {
+        LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class).eq(UserDO::getUserName, username);
+        UserDO userDO = baseMapper.selectOne(queryWrapper);
+        return userDO == null;
     }
 }
