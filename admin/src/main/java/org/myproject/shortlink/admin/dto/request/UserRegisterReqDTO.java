@@ -1,26 +1,22 @@
-package org.myproject.shortlink.admin.dao.entity;
+package org.myproject.shortlink.admin.dto.request;
 
-import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/*
+用户注册请求实体
+ */
 @Data
-@TableName("t_user")
-public class UserDO {
-    @TableId(type = IdType.AUTO)
+public class UserRegisterReqDTO {
     private Long id;
-    @TableField("username")
     private String userName;
     private String password;
     private String realName;
     private String phone;
     private String mail;
     private LocalDateTime deletionTime;
-    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    @TableField(fill = FieldFill.INSERT)
     private Boolean delFlag;
 }
