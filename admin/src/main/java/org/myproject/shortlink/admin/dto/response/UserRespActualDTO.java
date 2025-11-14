@@ -1,21 +1,17 @@
 package org.myproject.shortlink.admin.dto.response;
 
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-import org.myproject.shortlink.admin.common.serialize.PhoneDesensitizationSerializer;
 
 import java.time.LocalDateTime;
 
 /*
-* 用户返回参数响应
-* */
+ * 用户返回无脱敏的参数响应
+ * */
 @Data
-public class UserRespDTO {
+public class UserRespActualDTO {
     private Long id;
     private String userName;
     private String realName;
-    @JsonSerialize(using = PhoneDesensitizationSerializer.class)
     private String phone;
     private String mail;
     private LocalDateTime deletionTime;
