@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 /**
  * 全局返回对象
+ * （@Data自动生成的set/get方法本身返回Void类型不支持链式调用，需要@Accessors）
  */
 @Data
 @Accessors(chain = true)

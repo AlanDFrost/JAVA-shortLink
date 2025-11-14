@@ -1,6 +1,8 @@
 package org.myproject.shortlink.admin.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.myproject.shortlink.admin.common.convention.result.Result;
+import org.myproject.shortlink.admin.common.convention.result.Results;
 import org.myproject.shortlink.admin.dto.response.UserRespDTO;
 import org.myproject.shortlink.admin.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/api/shortlink/v1/user/{username}")
-    public UserRespDTO getUserByUsername(@PathVariable("username") String username) {
-        return userService.getUserByUsername(username);
+    public Result<UserRespDTO> getUserByUsername(@PathVariable("username") String username) {
+        UserRespDTO result = userService.getUserByUsername(username);
+        return Results.success(result);
     }
 }
