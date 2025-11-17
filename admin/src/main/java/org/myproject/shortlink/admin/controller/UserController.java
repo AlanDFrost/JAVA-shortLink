@@ -74,4 +74,22 @@ public class UserController {
         UserLoginRespDTO result = userService.login(requestParam);
         return Results.success(result);
     }
+
+    /*
+    验证用户登录
+     */
+    @GetMapping("/api/short-link/v1/user/check-login")
+    public Result<Boolean> checklogin(@RequestParam("username") String username, @RequestParam("token") String token) {
+        Boolean result = userService.checklogin(username, token);
+        return Results.success(result);
+    }
+
+    /*
+    用户退出登录
+     */
+    @DeleteMapping("/api/short-link/v1/user/logout")
+    public Result<Void> logout(@RequestParam("username") String username, @RequestParam("token") String token) {
+        userService.logout(username, token);
+        return Results.success();
+    }
 }

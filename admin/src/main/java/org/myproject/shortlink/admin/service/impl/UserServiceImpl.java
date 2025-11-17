@@ -106,8 +106,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
          Key: login_用户名
          Value: key（token标识） val：json字符串（session）
           */
-        stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), "token", JSON.toJSONString(userDO));
+        stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), uuid,  JSON.toJSONString(userDO));
         stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.MINUTES);
         return new UserLoginRespDTO(uuid);
+    }
+
+    @Override
+    public Boolean checklogin(String username, String token) {
+        Object remoteToken = stringRedisTemplate.opsForHash().get("login_" + username, token);
+        return remoteToken != null;
+    }
+
+    @Override
+    public void logout(String username, String token) {
+        if (checklogin(username, token)) {
+            stringRedisTemplate.delete("login_" + username);
+            return;
+        }
+        throw new ClientException("用户token不存在或者未登录");
     }
 }
