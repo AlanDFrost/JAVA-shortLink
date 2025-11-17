@@ -4,8 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.admin.common.convention.result.Result;
 import org.myproject.shortlink.admin.common.convention.result.Results;
+import org.myproject.shortlink.admin.dto.request.UserLoginReqDTO;
 import org.myproject.shortlink.admin.dto.request.UserRegisterReqDTO;
 import org.myproject.shortlink.admin.dto.request.UserUpdateReqDTO;
+import org.myproject.shortlink.admin.dto.response.UserLoginRespDTO;
 import org.myproject.shortlink.admin.dto.response.UserRespActualDTO;
 import org.myproject.shortlink.admin.dto.response.UserRespDTO;
 import org.myproject.shortlink.admin.service.UserService;
@@ -62,5 +64,14 @@ public class UserController {
     public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam) {
         userService.update(requestParam);
         return Results.success();
+    }
+
+    /*
+    用户登录
+     */
+    @PostMapping("/api/short-link/v1/user/login")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO requestParam) {
+        UserLoginRespDTO result = userService.login(requestParam);
+        return Results.success(result);
     }
 }
