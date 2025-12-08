@@ -4,10 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.admin.common.convention.result.Result;
 import org.myproject.shortlink.admin.common.convention.result.Results;
 import org.myproject.shortlink.admin.dto.request.GroupSaveReqDTO;
+import org.myproject.shortlink.admin.dto.response.GroupSearchRespDTO;
 import org.myproject.shortlink.admin.service.GroupService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /*
 短链接分组控制层
@@ -21,5 +25,10 @@ public class GroupController {
     public Result<Void> saveGroup(@RequestBody GroupSaveReqDTO requestParam) {
         groupService.saveGroup(requestParam.getName());
         return Results.success();
+    }
+
+    @GetMapping("/api/short-link/v1/group")
+    public Result<List<GroupSearchRespDTO>> listGroup() {
+        return Results.success(groupService.listGroup());
     }
 }
