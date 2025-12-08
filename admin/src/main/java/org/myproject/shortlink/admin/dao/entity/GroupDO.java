@@ -1,13 +1,19 @@
 package org.myproject.shortlink.admin.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
 @Data
 @TableName("t_group")
-public class GroupDO {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class GroupDO extends BaseDO{
     /** 自增主键 */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -23,16 +29,4 @@ public class GroupDO {
 
     /** 分组排序值 */
     private Integer sortOrder;
-
-    /** 创建时间（MP 自动填充） */
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /** 修改时间（MP 自动填充） */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
-    /** 删除标记（0=正常，1=删除） */
-    @TableLogic
-    private Integer delFlag;
 }
