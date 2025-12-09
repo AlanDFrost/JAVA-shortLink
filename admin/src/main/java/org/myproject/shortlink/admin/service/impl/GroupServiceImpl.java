@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.myproject.shortlink.admin.common.biz.user.UserContext;
 import org.myproject.shortlink.admin.dao.entity.GroupDO;
 import org.myproject.shortlink.admin.dao.mapper.GroupMapper;
 import org.myproject.shortlink.admin.dto.response.GroupSearchRespDTO;
@@ -24,13 +25,20 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
             gid = RandomGnerator.genrateRandomString();
         } while (hasGid(gid));
 
-        GroupDO groupDO = GroupDO.builder().gid(gid).name(groupName).sortOrder(0).build();
+        GroupDO groupDO = GroupDO.builder()
+                .gid(gid)
+                .name(groupName)
+                .username(UserContext.getUsername())
+                .sortOrder(0)
+                .build();
         baseMapper.insert(groupDO);
     }
 
     @Override
     public boolean hasGid(String gid) {
-        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class).eq(GroupDO::getGid, gid);
+        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
+                .eq(GroupDO::getGid, gid)
+                .eq(GroupDO::getUsername, UserContext.getUsername());
         GroupDO groupDO = baseMapper.selectOne(queryWrapper);
         return groupDO != null;
     }
@@ -38,7 +46,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
     @Override
     public List<GroupSearchRespDTO> listGroup() {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
-                .eq(GroupDO::getUsername, "zyc") // TODO：注意这里要改成真正的用户名
+                .eq(GroupDO::getUsername, UserContext.getUsername())
                 .eq(GroupDO::getDelFlag, 0)
                 .orderByDesc(GroupDO::getSortOrder,  GroupDO::getUpdateTime);
         List<GroupDO> groupList = baseMapper.selectList(queryWrapper);

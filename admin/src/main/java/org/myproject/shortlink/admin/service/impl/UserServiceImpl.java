@@ -106,8 +106,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
          Key: login_用户名
          Value: key（token标识） val：json字符串（session）
           */
-        stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), uuid,  JSON.toJSONString(userDO));
-        stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), uuid, JSON.toJSONString(userDO));
+        stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.DAYS);
         return new UserLoginRespDTO(uuid);
     }
 
