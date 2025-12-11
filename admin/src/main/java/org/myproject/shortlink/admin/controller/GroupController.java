@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.admin.common.convention.result.Result;
 import org.myproject.shortlink.admin.common.convention.result.Results;
 import org.myproject.shortlink.admin.dto.request.GroupSaveReqDTO;
+import org.myproject.shortlink.admin.dto.request.GroupUpdateReqDTO;
 import org.myproject.shortlink.admin.dto.response.GroupSearchRespDTO;
 import org.myproject.shortlink.admin.service.GroupService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,12 +21,20 @@ public class GroupController {
 
     @PostMapping("/api/short-link/v1/group")
     public Result<Void> saveGroup(@RequestBody GroupSaveReqDTO requestParam) {
-        groupService.saveGroup(requestParam.getName());
+        groupService.saveGroup(requestParam.getGroupName());
         return Results.success();
     }
 
     @GetMapping("/api/short-link/v1/group")
     public Result<List<GroupSearchRespDTO>> listGroup() {
         return Results.success(groupService.listGroup());
+    }
+
+    @PutMapping("/api/short-link/v1/group")
+    public Result<Void> updateGroup(@RequestBody GroupUpdateReqDTO requestParam) {
+        String groupName = requestParam.getGroupName();
+        String gid = requestParam.getGid();
+        groupService.updateGroup(gid, groupName);
+        return Results.success();
     }
 }

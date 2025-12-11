@@ -15,4 +15,7 @@ public interface GroupService extends IService<GroupDO> {
 
     // 查询用户短链接分组集合
     List<GroupSearchRespDTO> listGroup();
+
+    // 根据分组id和分组名修改分组名
+    void updateGroup(String gid, String groupName);
 }
