@@ -18,4 +18,7 @@ public interface GroupService extends IService<GroupDO> {
 
     // 根据分组id和分组名修改分组名
     void updateGroup(String gid, String groupName);
+
+    // 根据分组id删除分组
+    void deleteGroup(String gid);
 }
