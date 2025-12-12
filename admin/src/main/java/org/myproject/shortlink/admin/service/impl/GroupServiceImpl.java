@@ -9,11 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.myproject.shortlink.admin.common.biz.user.UserContext;
 import org.myproject.shortlink.admin.dao.entity.GroupDO;
 import org.myproject.shortlink.admin.dao.mapper.GroupMapper;
+import org.myproject.shortlink.admin.dto.request.GroupSortReqDTO;
 import org.myproject.shortlink.admin.dto.response.GroupSearchRespDTO;
 import org.myproject.shortlink.admin.service.GroupService;
 import org.myproject.shortlink.admin.toolkit.RandomGnerator;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -74,5 +76,19 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .set(GroupDO::getDelFlag, 1);
 
         baseMapper.update(null, updateWrapper);
+    }
+
+    @Override
+    public void sortGroup(List<GroupSortReqDTO> requestParam) {
+        for (GroupSortReqDTO dto : requestParam) {
+            LambdaUpdateWrapper<GroupDO> wrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                    .eq(GroupDO::getUsername, UserContext.getUsername())
+                    .eq(GroupDO::getGid, dto.getGid())
+                    .eq(GroupDO::getDelFlag, 0)
+                    .set(GroupDO::getSortOrder, dto.getSortOrder())
+                    .set(GroupDO::getUpdateTime, LocalDateTime.now());
+
+            baseMapper.update(null, wrapper);
+        }
     }
 }
