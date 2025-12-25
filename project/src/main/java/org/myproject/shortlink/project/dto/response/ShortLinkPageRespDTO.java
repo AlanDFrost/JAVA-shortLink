@@ -1,20 +1,14 @@
-package org.myproject.shortlink.project.dao.entity;
+package org.myproject.shortlink.project.dto.response;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-/**
- * 短链接实体类，对应表：t_link
- */
 @Data
-@TableName("t_link")  // ← 请改成你的实际表名
-public class ShortLinkDO extends BaseDO{
-
+public class ShortLinkPageRespDTO {
     /** 主键ID，自增 */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -36,12 +30,6 @@ public class ShortLinkDO extends BaseDO{
 
     /** 所属分组ID（例如：groupId） */
     private String gid;
-
-    /** 启用状态：0 启用、1 未启用 */
-    private Integer enableStatus;
-
-    /** 创建方式：0 接口创建、1 控制台创建 */
-    private Integer createdType;
 
     /** 有效期类型：0 永久、1 自定义 */
     private Integer validDateType;

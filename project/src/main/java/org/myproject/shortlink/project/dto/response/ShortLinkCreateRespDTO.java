@@ -18,4 +18,7 @@ public class ShortLinkCreateRespDTO {
 
     /** 原始长链接 */
     private String originUrl;
+
+    /** 图标 */
+    private String favicon;
 }

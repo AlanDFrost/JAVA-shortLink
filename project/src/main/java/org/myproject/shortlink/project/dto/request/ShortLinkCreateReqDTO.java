@@ -26,4 +26,7 @@ public class ShortLinkCreateReqDTO {
 
     /** 描述信息 */
     private String describe;
+
+    /** 图标 */
+    private String favicon;
 }
