@@ -1,14 +1,20 @@
 package org.myproject.shortlink.project.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.myproject.shortlink.project.common.convention.exception.ServiceException;
 import org.myproject.shortlink.project.dao.entity.ShortLinkDO;
 import org.myproject.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.myproject.shortlink.project.dto.request.ShortLinkCreateReqDTO;
 import org.myproject.shortlink.project.dto.response.ShortLinkCreateRespDTO;
 import org.myproject.shortlink.project.service.ShortLinkService;
 import org.myproject.shortlink.project.toolkit.HashUtil;
+import org.redisson.api.RBloomFilter;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 /*
@@ -16,16 +22,30 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLinkDO> implements ShortLinkService {
+    private final RBloomFilter<String> shotUriCreateCachePenetrationBloomFilter;
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestparam) {
         String shortLinkSuffix = generateSuffix(requestparam);
+        String fullShortUrl = requestparam.getDomain() + "/" + shortLinkSuffix;
         ShortLinkDO shortLinkDO = BeanUtil.toBean(requestparam, ShortLinkDO.class);
         shortLinkDO.setShortUri(shortLinkSuffix);
-        shortLinkDO.setFullShortUrl(requestparam.getDomain() + "/" + shortLinkSuffix);
+        shortLinkDO.setFullShortUrl(fullShortUrl);
 
-        baseMapper.insert(shortLinkDO);
+        try {
+            baseMapper.insert(shortLinkDO);
+        } catch (DuplicateKeyException ex) {
+            LambdaQueryWrapper queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                            .eq(ShortLinkDO::getFullShortUrl, fullShortUrl);
+            ShortLinkDO hasShortLinkDO = baseMapper.selectOne(queryWrapper);
+            if (hasShortLinkDO != null) {
+                log.warn("短链接 {} 重复入库", fullShortUrl);
+                throw new ServiceException("短链接生成重复");
+            }
+        }
+        shotUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .fullShortUrl(shortLinkDO.getFullShortUrl())
                 .originUrl(requestparam.getOriginUrl())
@@ -34,7 +54,21 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestparam) {
+        int customGnerateCount = 0;
+        String shortUri;
         String originalUrl = requestparam.getOriginUrl();
-        return HashUtil.hashToBase62(originalUrl);
+        while (true) {
+            if (customGnerateCount > 10) {
+                throw new ServiceException("短链接频繁生成，请稍后再试");
+            }
+            originalUrl += System.currentTimeMillis();
+            shortUri = HashUtil.hashToBase62(originalUrl);
+
+            if (!shotUriCreateCachePenetrationBloomFilter.contains(requestparam.getDomain() + "/" + shortUri)) {
+                break;
+            }
+            customGnerateCount++;
+        }
+        return shortUri;
     }
 }
