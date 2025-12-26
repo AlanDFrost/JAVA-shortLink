@@ -3,9 +3,11 @@ package org.myproject.shortlink.project.dto.response;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class ShortLinkPageRespDTO {
@@ -33,6 +35,10 @@ public class ShortLinkPageRespDTO {
 
     /** 有效期类型：0 永久、1 自定义 */
     private Integer validDateType;
+
+    /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT-8")
+    private Date createTime;
 
     /** 有效期时间 */
     private LocalDateTime validDate;
