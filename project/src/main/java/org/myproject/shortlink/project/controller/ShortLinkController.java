@@ -7,12 +7,12 @@ import org.myproject.shortlink.project.common.convention.result.Results;
 import org.myproject.shortlink.project.dto.request.ShortLinkCreateReqDTO;
 import org.myproject.shortlink.project.dto.request.ShortLinkPageReqDTO;
 import org.myproject.shortlink.project.dto.response.ShortLinkCreateRespDTO;
+import org.myproject.shortlink.project.dto.response.ShortLinkGroupCountQueryRespDTO;
 import org.myproject.shortlink.project.dto.response.ShortLinkPageRespDTO;
 import org.myproject.shortlink.project.service.ShortLinkService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +27,10 @@ public class ShortLinkController {
     @GetMapping("/api/short-link/project/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink (ShortLinkPageReqDTO requestparam) {
         return Results.success(shortLinkService.pageShortLink(requestparam));
+    }
+
+    @GetMapping("/api/short-link/project/v1/count")
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> pageShortLink (@RequestParam("gid") List<String> gids) {
+        return Results.success(shortLinkService.listGroupShortLinkCount(gids));
     }
 }

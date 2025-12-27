@@ -20,5 +20,6 @@ public class BaseDO {
 
     /** 删除标记（0=正常，1=删除） */
     @TableLogic
+    @TableField(fill = FieldFill.INSERT)
     private Integer delFlag;
 }
