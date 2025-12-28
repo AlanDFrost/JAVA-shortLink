@@ -11,8 +11,10 @@ public interface GroupService extends IService<GroupDO> {
     // 新增短链接分组
     void saveGroup(String groupName);
 
+    void saveGroup(String userName, String groupName);
+
     // gid是否已存在
-    boolean hasGid(String gid);
+    boolean hasGid(String username, String gid);
 
     // 查询用户短链接分组集合
     List<GroupSearchRespDTO> listGroup();

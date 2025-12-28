@@ -69,7 +69,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 if (inserted < 1) throw new ClientException(UserErrorCodeEnum.USER_SAVE_FAILED);
 
                 userRegisterCachePenetrationBloomFilter.add(requestParam.getUserName());
-                groupService.saveGroup("默认分组");
+                groupService.saveGroup(requestParam.getUserName(), "默认分组");
                 return;
             }
             throw new ClientException(UserErrorCodeEnum.USER_NAME_EXIST);

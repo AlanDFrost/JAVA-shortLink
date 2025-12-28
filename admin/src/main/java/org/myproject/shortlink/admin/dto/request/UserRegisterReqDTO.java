@@ -2,8 +2,6 @@ package org.myproject.shortlink.admin.dto.request;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /*
 用户注册请求实体
  */
@@ -15,8 +13,4 @@ public class UserRegisterReqDTO {
     private String realName;
     private String phone;
     private String mail;
-    private LocalDateTime deletionTime;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
-    private Boolean delFlag;
 }
