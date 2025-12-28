@@ -30,7 +30,7 @@ public class ShortLinkController {
     }
 
     @GetMapping("/api/short-link/project/v1/count")
-    public Result<List<ShortLinkGroupCountQueryRespDTO>> pageShortLink (@RequestParam("gid") List<String> gids) {
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> pageShortLink (@RequestParam("gids") List<String> gids) {
         return Results.success(shortLinkService.listGroupShortLinkCount(gids));
     }
 }

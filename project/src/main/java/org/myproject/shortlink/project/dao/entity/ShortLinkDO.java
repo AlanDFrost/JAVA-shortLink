@@ -1,9 +1,6 @@
 package org.myproject.shortlink.project.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -38,6 +35,7 @@ public class ShortLinkDO extends BaseDO{
     private String gid;
 
     /** 启用状态：0 启用、1 未启用 */
+    @TableField(fill = FieldFill.INSERT)
     private Integer enableStatus;
 
     /** 创建方式：0 接口创建、1 控制台创建 */

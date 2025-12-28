@@ -13,5 +13,6 @@ public class GroupSearchRespDTO {
     /** 分组排序值 */
     private Integer sortOrder;
 
+    /** 组内短链接数量 */
     private Integer shortLinkCount;
 }

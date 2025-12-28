@@ -7,20 +7,26 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.myproject.shortlink.admin.common.biz.user.UserContext;
+import org.myproject.shortlink.admin.common.convention.result.Result;
 import org.myproject.shortlink.admin.dao.entity.GroupDO;
 import org.myproject.shortlink.admin.dao.mapper.GroupMapper;
 import org.myproject.shortlink.admin.dto.request.GroupSortReqDTO;
 import org.myproject.shortlink.admin.dto.response.GroupSearchRespDTO;
+import org.myproject.shortlink.admin.remote.ShortLinkRemoteService;
+import org.myproject.shortlink.admin.remote.dto.response.ShortLinkGroupCountQueryRespDTO;
 import org.myproject.shortlink.admin.service.GroupService;
 import org.myproject.shortlink.admin.toolkit.RandomGnerator;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implements GroupService {
+    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {};
     @Override
     public void saveGroup(String groupName) {
         String gid;
@@ -53,7 +59,16 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
                 .eq(GroupDO::getDelFlag, 0)
                 .orderByDesc(GroupDO::getSortOrder,  GroupDO::getUpdateTime);
         List<GroupDO> groupList = baseMapper.selectList(queryWrapper);
-        return BeanUtil.copyToList(groupList, GroupSearchRespDTO.class);
+        Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkRemoteService.listGroupShortLinkCount(groupList.stream().map(GroupDO::getGid).toList());
+
+        List<GroupSearchRespDTO> GroupSearchList = BeanUtil.copyToList(groupList, GroupSearchRespDTO.class);
+        GroupSearchList.forEach(each -> {
+            Optional<ShortLinkGroupCountQueryRespDTO> first = listResult.getData().stream()
+                    .filter(item -> Objects.equals(item.getGid(), each.getGid()))
+                    .findFirst();
+            first.ifPresent(item -> each.setShortLinkCount(item.getShortLinkCount()));
+        });
+        return GroupSearchList;
     }
 
     @Override
