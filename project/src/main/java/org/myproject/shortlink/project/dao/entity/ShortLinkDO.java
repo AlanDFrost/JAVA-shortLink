@@ -1,6 +1,7 @@
 package org.myproject.shortlink.project.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,9 @@ import java.time.LocalDateTime;
 /**
  * 短链接实体类，对应表：t_link
  */
+
 @Data
+@Builder
 @TableName("t_link")  // ← 请改成你的实际表名
 public class ShortLinkDO extends BaseDO{
 
