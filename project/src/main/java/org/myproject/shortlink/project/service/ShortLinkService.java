@@ -2,6 +2,8 @@ package org.myproject.shortlink.project.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.myproject.shortlink.project.dao.entity.ShortLinkDO;
 import org.myproject.shortlink.project.dto.request.ShortLinkCreateReqDTO;
 import org.myproject.shortlink.project.dto.request.ShortLinkPageReqDTO;
@@ -35,4 +37,9 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     查询短链接分组内有多少条短链接
      */
     List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> gids);
+
+    /*
+    短链接跳转原始链接
+     */
+    void restoreUrl(String shortUri, ServletRequest request, ServletResponse response);
 }
