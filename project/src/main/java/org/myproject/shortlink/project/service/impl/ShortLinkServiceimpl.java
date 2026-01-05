@@ -128,10 +128,14 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         boolean isContained = shotUriCreateCachePenetrationBloomFilter.contains(fullShortUrl);
         if (!isContained) {
+            ((HttpServletResponse)response).sendRedirect("/page/notfound");
             return ;
         }
         String gotoIsNullShortLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
-        if (StrUtil.isNotBlank(gotoIsNullShortLink)) return;
+        if (StrUtil.isNotBlank(gotoIsNullShortLink)) {
+            ((HttpServletResponse)response).sendRedirect("/page/notfound");
+            return;
+        }
 
         RLock lock = redissonClient.getLock(String.format(LOCK_GOTO_SHORT_LINK_KEY, fullShortUrl));
         lock.lock();
@@ -146,6 +150,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
             ShortLinkGoToDO shortLinkGoToDO = shortLinkGoToMapper.selectOne(goToDOqueryWrapper);
             if (shortLinkGoToDO == null) {
                 stringRedisTemplate.opsForValue().set(StrUtil.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.SECONDS);
+                ((HttpServletResponse)response).sendRedirect("/page/notfound");
                 return;
             }
 
@@ -158,6 +163,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
             if (shortLinkDO != null) {
                 if (shortLinkDO.getValidDate() != null && (LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()) == 0)) {
                     stringRedisTemplate.opsForValue().set(StrUtil.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.SECONDS);
+                    ((HttpServletResponse)response).sendRedirect("/page/notfound");
                     return;
                 }
 
