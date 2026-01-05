@@ -39,9 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
-import static org.myproject.shortlink.project.common.constant.RedisKeyConstant.GOTO_SHORT_LINK_KEY;
-import static org.myproject.shortlink.project.common.constant.RedisKeyConstant.LOCK_GOTO_SHORT_LINK_KEY;
+import static org.myproject.shortlink.project.common.constant.RedisKeyConstant.*;
 
 /*
 短链接接口实现层
@@ -112,12 +112,20 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String serverName = request.getServerName();
         String fullShortUrl = "http://" + serverName + "/" + shortUri;
 
-        // 先去 Redis 里面查有没有短链接，如果没有再去数据库查，同时用 Redis 的分布式锁串行查找，防止数据库打满
+        // 先去 Redis 里面查有没有短链接。如果没有再去布隆过滤器查，不存在直接返回，存在再去缓存查是否是null，不是再拿锁去数据库查
         String originalLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalLink)) {
             ((HttpServletResponse)response).sendRedirect(originalLink);
             return ;
         }
+
+        boolean isContained = shotUriCreateCachePenetrationBloomFilter.contains(fullShortUrl);
+        if (!isContained) {
+            return ;
+        }
+        String gotoIsNullShortLink = stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl));
+        if (StrUtil.isNotBlank(gotoIsNullShortLink)) return;
+
         RLock lock = redissonClient.getLock(String.format(LOCK_GOTO_SHORT_LINK_KEY, fullShortUrl));
         lock.lock();
         try {
@@ -130,7 +138,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
             LambdaQueryWrapper<ShortLinkGoToDO> goToDOqueryWrapper = Wrappers.lambdaQuery(ShortLinkGoToDO.class).eq(ShortLinkGoToDO::getFullShortUrl, fullShortUrl);
             ShortLinkGoToDO shortLinkGoToDO = shortLinkGoToMapper.selectOne(goToDOqueryWrapper);
             if (shortLinkGoToDO == null) {
-                // 此处需要严谨的风控
+                stringRedisTemplate.opsForValue().set(StrUtil.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.SECONDS);
                 return;
             }
 
