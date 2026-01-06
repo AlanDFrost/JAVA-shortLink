@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecycleBinController {
     private final ShortLinkRemoteService shortLinkRemoteService;
 
-    @PostMapping("/api/short-link/v1/admin/recycle-bin/save")
+    @PostMapping("/api/short-link/admin/v1/recycle-bin/save")
     public Result<Void> saveRecycleBin(@RequestBody RecycleBinSaveReqDTO requestParam) {
         shortLinkRemoteService.saveRecycleBin(requestParam);
         return Results.success();
     }
 
-    @GetMapping("/api/short-link/v1/admin/recycle-bin/page")
+    @GetMapping("/api/short-link/admin/v1/recycle-bin/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageRecycleBin (ShortLinkPageReqDTO requestparam) {
         return shortLinkRemoteService.pageRecycleBin(requestparam);
     }
