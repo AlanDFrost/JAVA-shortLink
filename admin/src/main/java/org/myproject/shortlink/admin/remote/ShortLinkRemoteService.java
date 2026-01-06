@@ -5,10 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.myproject.shortlink.admin.common.convention.result.Result;
-import org.myproject.shortlink.admin.remote.dto.request.RecycleBinSaveReqDTO;
-import org.myproject.shortlink.admin.remote.dto.request.ShortLinkCreateReqDTO;
-import org.myproject.shortlink.admin.remote.dto.request.ShortLinkPageReqDTO;
-import org.myproject.shortlink.admin.remote.dto.request.ShortLinkUpdateReqDTO;
+import org.myproject.shortlink.admin.remote.dto.request.*;
 import org.myproject.shortlink.admin.remote.dto.response.ShortLinkCreateRespDTO;
 import org.myproject.shortlink.admin.remote.dto.response.ShortLinkGroupCountQueryRespDTO;
 import org.myproject.shortlink.admin.remote.dto.response.ShortLinkPageRespDTO;
@@ -54,9 +51,14 @@ public interface ShortLinkRemoteService {
 
     /** 短链接删除至回收站 */
     default void saveRecycleBin(RecycleBinSaveReqDTO requestParam) {
-        HttpUtil.post("http://127.0.0.1:8001/api/short-link/projectv1/recycle-bin/save", JSON.toJSONString(requestParam));
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/project/v1/recycle-bin/save", JSON.toJSONString(requestParam));
     }
 
+    /**
+     * 查询回收站里的短链接
+     * @param requestparam
+     * @return
+     */
     default  Result<IPage<ShortLinkPageRespDTO>> pageRecycleBin (ShortLinkPageReqDTO requestparam) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("gid", requestparam.getGid());
@@ -66,5 +68,13 @@ public interface ShortLinkRemoteService {
 
         return JSON.parseObject(resultPageStr, new TypeReference<>() {
         });
+    }
+
+    /**
+     * 汇入短链接
+     * @param requestParam
+     */
+    default void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
+        HttpUtil.post("http://127.0.0.1:8001/api/short-link/project/v1/recycle-bin/recover", JSON.toJSONString(requestParam));
     }
 }

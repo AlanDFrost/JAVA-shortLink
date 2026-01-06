@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.project.common.convention.result.Result;
 import org.myproject.shortlink.project.common.convention.result.Results;
+import org.myproject.shortlink.project.dto.request.RecycleBinRecoverReqDTO;
 import org.myproject.shortlink.project.dto.request.RecycleBinSaveReqDTO;
 import org.myproject.shortlink.project.dto.request.ShortLinkPageReqDTO;
 import org.myproject.shortlink.project.dto.response.ShortLinkPageRespDTO;
@@ -27,5 +28,11 @@ public class RecycleBinController {
     @GetMapping("/api/short-link/project/v1/recycle-bin/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageRecycleBin (ShortLinkPageReqDTO requestparam) {
         return Results.success(recycleBinService.pageShortLink(requestparam));
+    }
+
+    @PostMapping("/api/short-link/project/v1/recycle-bin/recover")
+    public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam) {
+        recycleBinService.recoverRecycleBin(requestParam);
+        return Results.success();
     }
 }

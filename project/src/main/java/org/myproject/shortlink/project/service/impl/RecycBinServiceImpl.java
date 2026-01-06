@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.project.dao.entity.ShortLinkDO;
 import org.myproject.shortlink.project.dao.mapper.ShortLinkMapper;
+import org.myproject.shortlink.project.dto.request.RecycleBinRecoverReqDTO;
 import org.myproject.shortlink.project.dto.request.RecycleBinSaveReqDTO;
 import org.myproject.shortlink.project.dto.request.ShortLinkPageReqDTO;
 import org.myproject.shortlink.project.dto.response.ShortLinkPageRespDTO;
@@ -16,6 +17,7 @@ import org.myproject.shortlink.project.service.RecycleBinService;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import static org.myproject.shortlink.project.common.constant.RedisKeyConstant.GOTO_IS_NULL_SHORT_LINK_KEY;
 import static org.myproject.shortlink.project.common.constant.RedisKeyConstant.GOTO_SHORT_LINK_KEY;
 
 /**
@@ -48,5 +50,18 @@ public class RecycBinServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLinkD
         IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestparam, queryWrapper);
 
         return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
+    }
+
+    @Override
+    public void recoverRecycleBin(RecycleBinRecoverReqDTO requestParam) {
+        LambdaUpdateWrapper<ShortLinkDO> updateWrapper = Wrappers.lambdaUpdate(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, requestParam.getGid())
+                .eq(ShortLinkDO::getFullShortUrl, requestParam.getFullShortUrl())
+                .eq(ShortLinkDO::getEnableStatus, 1)
+                .eq(ShortLinkDO::getDelFlag, 0);
+        ShortLinkDO shortLinkDO = ShortLinkDO.builder().enableStatus(0).build();
+        baseMapper.update(shortLinkDO, updateWrapper);
+
+        stringRedisTemplate.delete(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, requestParam.getFullShortUrl()));
     }
 }

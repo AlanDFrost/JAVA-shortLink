@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.admin.common.convention.result.Result;
 import org.myproject.shortlink.admin.common.convention.result.Results;
 import org.myproject.shortlink.admin.remote.ShortLinkRemoteService;
+import org.myproject.shortlink.admin.remote.dto.request.RecycleBinRecoverReqDTO;
 import org.myproject.shortlink.admin.remote.dto.request.RecycleBinSaveReqDTO;
 import org.myproject.shortlink.admin.remote.dto.request.ShortLinkPageReqDTO;
 import org.myproject.shortlink.admin.remote.dto.response.ShortLinkPageRespDTO;
@@ -27,5 +28,11 @@ public class RecycleBinController {
     @GetMapping("/api/short-link/admin/v1/recycle-bin/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageRecycleBin (ShortLinkPageReqDTO requestparam) {
         return shortLinkRemoteService.pageRecycleBin(requestparam);
+    }
+
+    @PostMapping("/api/short-link/admin/v1/recycle-bin/recover")
+    public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO requestParam) {
+        shortLinkRemoteService.recoverRecycleBin(requestParam);
+        return Results.success();
     }
 }
