@@ -26,14 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.myproject.shortlink.project.common.convention.exception.ClientException;
 import org.myproject.shortlink.project.common.convention.exception.ServiceException;
 import org.myproject.shortlink.project.common.enums.ValidDateTypeEnum;
-import org.myproject.shortlink.project.dao.entity.LinkAccessStatsDO;
-import org.myproject.shortlink.project.dao.entity.LinkLocaleStatsDO;
-import org.myproject.shortlink.project.dao.entity.ShortLinkDO;
-import org.myproject.shortlink.project.dao.entity.ShortLinkGoToDO;
-import org.myproject.shortlink.project.dao.mapper.LinkAccessStatsMapper;
-import org.myproject.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
-import org.myproject.shortlink.project.dao.mapper.ShortLinkGoToMapper;
-import org.myproject.shortlink.project.dao.mapper.ShortLinkMapper;
+import org.myproject.shortlink.project.dao.entity.*;
+import org.myproject.shortlink.project.dao.mapper.*;
 import org.myproject.shortlink.project.dto.request.ShortLinkCreateReqDTO;
 import org.myproject.shortlink.project.dto.request.ShortLinkPageReqDTO;
 import org.myproject.shortlink.project.dto.request.ShortLinkUpdateReqDTO;
@@ -72,6 +66,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+    private final LinkOsStatsMapper linkOsStatsMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -208,6 +203,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
             gid = shortLinkGoToDO.getGid();
         }
 
+        // 访问量监控
         AtomicBoolean uvFirstFlag = new AtomicBoolean();
         Cookie[] cookies = ((HttpServletRequest) request).getCookies();
         Runnable addReqsponseCookiesTask = () -> {
@@ -250,6 +246,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .build();
         linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
 
+        // IP监控
         Map<String, Object> localeParamMap = new HashMap<>();
         localeParamMap.put("key", statsLocaleAmapKey);
         localeParamMap.put("ip", remoteAddr);
@@ -271,6 +268,13 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .build();
             linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
         }
+
+        // 操作系统监控
+        String OS = LinkUtil.getOs((HttpServletRequest) request);
+        LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder().fullShortUrl(fullShortUrl).gid(gid).date(new Date()).cnt(1)
+                .os(OS)
+                .build();
+        linkOsStatsMapper.shortLinkOsState(linkOsStatsDO);
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 import static org.myproject.shortlink.project.common.constant.ShortLinkConstant.DEFAULT_CACHE_VALID_TIME;
 
@@ -51,6 +52,28 @@ public class LinkUtil {
         }
 
         return ipAddress;
+    }
+
+    public static String getOs(HttpServletRequest request) {
+        String ua = request.getHeader("User-Agent");
+        if (ua == null || ua.isBlank()) {
+            return "Unknown";
+        }
+        String s = ua.toLowerCase(Locale.ROOT);
+
+        // 移动端优先（避免 iPhone 同时包含 Mac OS X 字样导致误判）
+        if (s.contains("android")) return "Android";
+        if (s.contains("iphone") || s.contains("ipad") || s.contains("ipod")) return "iOS";
+
+        // 桌面端
+        if (s.contains("windows nt")) return "Windows";
+        if (s.contains("mac os x") || s.contains("macintosh")) return "macOS";
+
+        // Linux / Unix
+        if (s.contains("linux")) return "Linux";
+        if (s.contains("x11")) return "Unix";
+
+        return "Unknown";
     }
 
 }
