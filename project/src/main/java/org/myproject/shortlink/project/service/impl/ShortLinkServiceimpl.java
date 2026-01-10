@@ -7,6 +7,9 @@ import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,9 +27,11 @@ import org.myproject.shortlink.project.common.convention.exception.ClientExcepti
 import org.myproject.shortlink.project.common.convention.exception.ServiceException;
 import org.myproject.shortlink.project.common.enums.ValidDateTypeEnum;
 import org.myproject.shortlink.project.dao.entity.LinkAccessStatsDO;
+import org.myproject.shortlink.project.dao.entity.LinkLocaleStatsDO;
 import org.myproject.shortlink.project.dao.entity.ShortLinkDO;
 import org.myproject.shortlink.project.dao.entity.ShortLinkGoToDO;
 import org.myproject.shortlink.project.dao.mapper.LinkAccessStatsMapper;
+import org.myproject.shortlink.project.dao.mapper.LinkLocaleStatsMapper;
 import org.myproject.shortlink.project.dao.mapper.ShortLinkGoToMapper;
 import org.myproject.shortlink.project.dao.mapper.ShortLinkMapper;
 import org.myproject.shortlink.project.dto.request.ShortLinkCreateReqDTO;
@@ -41,6 +46,7 @@ import org.myproject.shortlink.project.toolkit.LinkUtil;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -51,6 +57,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.myproject.shortlink.project.common.constant.RedisKeyConstant.*;
+import static org.myproject.shortlink.project.common.constant.ShortLinkConstant.AMAP_RENOTE_URL;
 
 /*
 短链接接口实现层
@@ -64,6 +71,10 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final StringRedisTemplate stringRedisTemplate;
     private final RedissonClient redissonClient;
     private final LinkAccessStatsMapper linkAccessStatsMapper;
+    private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+
+    @Value("${short-link.stats.locale.amap-key}")
+    private String statsLocaleAmapKey;
 
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO requestparam) {
@@ -238,6 +249,28 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .date(new Date())
                 .build();
         linkAccessStatsMapper.shortLinkStats(linkAccessStatsDO);
+
+        Map<String, Object> localeParamMap = new HashMap<>();
+        localeParamMap.put("key", statsLocaleAmapKey);
+        localeParamMap.put("ip", remoteAddr);
+        String localeResultStr = HttpUtil.get(AMAP_RENOTE_URL, localeParamMap);
+        JSONObject localeResultObj = JSON.parseObject(localeResultStr);
+        String infocode = localeResultObj.getString("infocode");
+        if (StrUtil.isNotBlank(infocode) && StrUtil.equals(infocode, "10000")) {
+            String province = localeResultObj.getString("province");
+            boolean isUnknowFlag = StrUtil.equals(province, "[]");
+            LinkLocaleStatsDO linkLocaleStatsDO = LinkLocaleStatsDO.builder()
+                    .province(isUnknowFlag ? "未知" : province)
+                    .city(isUnknowFlag ? "未知" : localeResultObj.getString("city"))
+                    .adcode(isUnknowFlag ? "未知" : localeResultObj.getString("adcode"))
+                    .cnt(1)
+                    .fullShortUrl(fullShortUrl)
+                    .country("中国")
+                    .gid(gid)
+                    .date(new Date())
+                    .build();
+            linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
