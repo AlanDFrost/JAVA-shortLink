@@ -7,6 +7,10 @@ import org.apache.ibatis.annotations.Param;
 import org.myproject.shortlink.project.dao.entity.LinkOsStatsDO;
 
 public interface LinkOsStatsMapper extends BaseMapper<LinkOsStatsDO> {
+    /**
+     * 记录操作系统访问数据持久层
+     * @param linkOsStatsDO
+     */
     @Insert("INSERT INTO t_link_os_stats (full_short_url, gid, date, cnt, os, create_time, update_time, del_flag)" +
             "VALUES(#{linkOsStats.fullShortUrl}, #{linkOsStats.gid}, #{linkOsStats.date}, #{linkOsStats.cnt}," +
             " #{linkOsStats.os}, NOW(), NOW(), 0) " +
