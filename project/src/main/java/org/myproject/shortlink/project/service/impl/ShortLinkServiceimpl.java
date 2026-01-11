@@ -260,6 +260,9 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String localeResultStr = HttpUtil.get(AMAP_RENOTE_URL, localeParamMap);
         JSONObject localeResultObj = JSON.parseObject(localeResultStr);
         String infocode = localeResultObj.getString("infocode");
+
+        String logProvince = "未知";
+        String logCity = "未知";
         if (StrUtil.isNotBlank(infocode) && StrUtil.equals(infocode, "10000")) {
             String province = localeResultObj.getString("province");
             boolean isUnknowFlag = StrUtil.equals(province, "[]");
@@ -274,6 +277,8 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .date(new Date())
                     .build();
             linkLocaleStatsMapper.shortLinkLocaleState(linkLocaleStatsDO);
+            logProvince = linkLocaleStatsDO.getProvince();
+            logCity = linkLocaleStatsDO.getCity();
         }
 
         // 操作系统监控
@@ -287,10 +292,6 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
         LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder().fullShortUrl(fullShortUrl).gid(gid).date(new Date())
                 .cnt(1).browser(browser).build();
         linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
-        // 监控日志
-        LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder().fullShortUrl(fullShortUrl).gid(gid).user(uv.get())
-                .browser(browser).os(os).ip(remoteAddr).build();
-        linkAccessLogsMapper.insert(linkAccessLogsDO);
         // 监控访问设备
         String device = LinkUtil.getDevice((HttpServletRequest) request);
         LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder().fullShortUrl(fullShortUrl).gid(gid).date(new Date())
@@ -301,6 +302,10 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
         LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder().fullShortUrl(fullShortUrl).gid(gid).cnt(1)
                 .date(new Date()).network(netWork).build();
         linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
+        // 监控日志
+        LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder().fullShortUrl(fullShortUrl).gid(gid).user(uv.get()).network(netWork)
+                .browser(browser).os(os).ip(remoteAddr).browser(browser).device(device).locale("中国" + logProvince + logCity).build();
+        linkAccessLogsMapper.insert(linkAccessLogsDO);
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -46,4 +46,19 @@ public class LinkAccessLogsDO extends BaseDO{
      * IP
      */
     private String ip;
+
+    /**
+     * 访问设备
+     */
+    private String device;
+
+    /**
+     * 访问网络
+     */
+    private String network;
+
+    /**
+     * 地区名称
+     */
+    private String locale;
 }
