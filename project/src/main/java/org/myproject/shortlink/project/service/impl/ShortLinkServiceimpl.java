@@ -72,7 +72,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessLogsMapper linkAccessLogsMapper;
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
-    private final ShortLinkMapper shortLinkMapper;
+    private final LinkStatsTodayMapper linkStatsTodayMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -311,6 +311,10 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .browser(browser).os(os).ip(remoteAddr).browser(browser).device(device).locale("中国" + logProvince + logCity).build();
         linkAccessLogsMapper.insert(linkAccessLogsDO);
         baseMapper.incrementStats(gid, fullShortUrl, 1, uvFirstFlag.get() ? 1 : 0, uipFirstFlag ? 1 : 0);
+        // 今日访问数据监控
+        LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder().fullShortUrl(fullShortUrl).gid(gid).date(new Date())
+                .todayPv(1).todayUv(uvFirstFlag.get() ? 1 : 0).todayUip(uipFirstFlag ? 1 : 0).build();
+        linkStatsTodayMapper.shortLinkTodayState(linkStatsTodayDO);
     }
 
     @Transactional(rollbackFor = Exception.class)
