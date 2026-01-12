@@ -73,6 +73,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
     private final LinkStatsTodayMapper linkStatsTodayMapper;
+    private final ShortLinkMapper shortLinkMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -117,11 +118,12 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     @Override
     public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestparam) {
-        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                .eq(ShortLinkDO::getGid, requestparam.getGid())
-                .eq(ShortLinkDO::getDelFlag, 0)
-                .eq(ShortLinkDO::getEnableStatus, 0);
-        IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestparam, queryWrapper);
+//        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+//                .eq(ShortLinkDO::getGid, requestparam.getGid())
+//                .eq(ShortLinkDO::getDelFlag, 0)
+//                .eq(ShortLinkDO::getEnableStatus, 0);
+//        IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestparam, queryWrapper);
+        IPage<ShortLinkDO> resultPage = shortLinkMapper.pageLink(requestparam);
 
         return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
     }

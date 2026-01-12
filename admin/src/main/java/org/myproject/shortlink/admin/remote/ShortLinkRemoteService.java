@@ -31,6 +31,7 @@ public interface ShortLinkRemoteService {
         requestMap.put("gid", requestparam.getGid());
         requestMap.put("current", requestparam.getCurrent());
         requestMap.put("size", requestparam.getSize());
+        requestMap.put("orderTag", requestparam.getOrderTag());
         String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/project/v1/page", requestMap);
 
         return JSON.parseObject(resultPageStr, new TypeReference<>() {

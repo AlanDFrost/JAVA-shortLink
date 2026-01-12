@@ -1,8 +1,10 @@
 package org.myproject.shortlink.project.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -12,57 +14,86 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-@TableName("t_link")  // ← 请改成你的实际表名
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("t_link")
 public class ShortLinkDO extends BaseDO{
-
-    /** 主键ID，自增 */
     @TableId(type = IdType.AUTO)
+    /**
+     * ID
+     */
     private Long id;
 
-    /** 域名 */
+    /**
+     * 域名
+     */
     private String domain;
 
-    /** 短链接后缀（例如 A3x9k） */
+    /**
+     * 短链接
+     */
     private String shortUri;
 
-    /** 完整短链接（域名 + / + 短链接） */
+    /**
+     * 完整短链接
+     */
     private String fullShortUrl;
 
-    /** 原始长链接 */
+    /**
+     * 原始链接
+     */
     private String originUrl;
 
-    /** 点击量 */
+    /**
+     * 点击量
+     */
     private Integer clickNum;
 
-    /** 所属分组ID（例如：groupId） */
+    /**
+     * 分组标识
+     */
     private String gid;
+
+    /**
+     * 网站图标
+     */
+    private String favicon;
 
     /** 启用状态：0 启用、1 未启用 */
     @TableField(fill = FieldFill.INSERT)
     private Integer enableStatus;
 
-    /** 创建方式：0 接口创建、1 控制台创建 */
+    /**
+     * 创建类型 0: 接口创建 1: 控制台创建
+     */
     private Integer createdType;
 
-    /** 有效期类型：0 永久、1 自定义 */
+    /**
+     * 有效期类型 0: 永久有效 1: 自定义
+     */
     private Integer validDateType;
 
-    /** 有效期时间 */
+    /**
+     * 有效期
+     */
     private LocalDateTime validDate;
 
     /** 描述信息 */
     @TableField("`describe`")
     private String describe;
 
-    /** 图标 */
-    private String favicon;
-
-    /** 历史总访问数*/
+    /**
+     * 历史PV
+     */
     private Integer totalPv;
 
-    /** 历史新用户访问数*/
+    /**
+     * 历史UV
+     */
     private Integer totalUv;
 
-    /** 历史总访问用户ip数*/
+    /**
+     * 历史UIP
+     */
     private Integer totalUip;
 }
