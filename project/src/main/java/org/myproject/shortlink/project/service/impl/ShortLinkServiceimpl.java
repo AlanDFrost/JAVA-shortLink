@@ -72,6 +72,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessLogsMapper linkAccessLogsMapper;
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
+    private final ShortLinkMapper shortLinkMapper;
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -83,6 +84,9 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
         ShortLinkDO shortLinkDO = BeanUtil.toBean(requestparam, ShortLinkDO.class);
         shortLinkDO.setShortUri(shortLinkSuffix);
         shortLinkDO.setFullShortUrl(fullShortUrl);
+        shortLinkDO.setTotalPv(0);
+        shortLinkDO.setTotalUv(0);
+        shortLinkDO.setTotalUip(0);
 
         ShortLinkGoToDO shortLinkGoToDO = ShortLinkGoToDO.builder().fullShortUrl(fullShortUrl).gid(requestparam.getGid()).build();
         try {
@@ -306,6 +310,7 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
         LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder().fullShortUrl(fullShortUrl).gid(gid).user(uv.get()).network(netWork)
                 .browser(browser).os(os).ip(remoteAddr).browser(browser).device(device).locale("中国" + logProvince + logCity).build();
         linkAccessLogsMapper.insert(linkAccessLogsDO);
+        baseMapper.incrementStats(gid, fullShortUrl, 1, uvFirstFlag.get() ? 1 : 0, uipFirstFlag ? 1 : 0);
     }
 
     @Transactional(rollbackFor = Exception.class)
