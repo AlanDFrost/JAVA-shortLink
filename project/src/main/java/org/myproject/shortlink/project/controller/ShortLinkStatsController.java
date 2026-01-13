@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.project.common.convention.result.Result;
 import org.myproject.shortlink.project.common.convention.result.Results;
+import org.myproject.shortlink.project.dto.request.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.myproject.shortlink.project.dto.request.ShortLinkStatsAccessRecordReqDTO;
 import org.myproject.shortlink.project.dto.response.ShortLinkStatsAccessRecordRespDTO;
 import org.myproject.shortlink.project.service.ShortLinkStatsService;
@@ -19,7 +20,12 @@ public class ShortLinkStatsController {
      * @return
      */
     @GetMapping("/api/short-link/project/v1/stats/access-record")
-    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> getShortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
-        return Results.success(shortLinkStatsService.getShortLinkStatsAccessRecord(requestParam));
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        return Results.success(shortLinkStatsService.shortLinkStatsAccessRecord(requestParam));
+    }
+
+    @GetMapping("/api/short-link/project/v1/stats/access-record/group")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        return Results.success(shortLinkStatsService.groupShortLinkStatsAccessRecord(requestParam));
     }
 }

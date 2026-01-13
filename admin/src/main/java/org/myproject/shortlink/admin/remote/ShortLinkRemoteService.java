@@ -93,13 +93,29 @@ public interface ShortLinkRemoteService {
      * @param requestparam
      * @return
      */
-    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> getShortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestparam) {
+    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> getShortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
         Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("fullShortUrl", requestparam.getFullShortUrl());
-        requestMap.put("gid", requestparam.getGid());
-        requestMap.put("current", requestparam.getCurrent());
-        requestMap.put("size", requestparam.getSize());
+        requestMap.put("fullShortUrl", requestParam.getFullShortUrl());
+        requestMap.put("gid", requestParam.getGid());
+        requestMap.put("current", requestParam.getCurrent());
+        requestMap.put("size", requestParam.getSize());
         String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/project/v1/stats/access-record", requestMap);
+
+        return JSON.parseObject(resultPageStr, new TypeReference<>() {
+        });
+    }
+
+    /**
+     * 访问分组短链接的监控日志
+     * @param requestParam
+     * @return
+     */
+    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("gid", requestParam.getGid());
+        requestMap.put("current", requestParam.getCurrent());
+        requestMap.put("size", requestParam.getSize());
+        String resultPageStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/project/v1/stats/access-record/group", requestMap);
 
         return JSON.parseObject(resultPageStr, new TypeReference<>() {
         });
