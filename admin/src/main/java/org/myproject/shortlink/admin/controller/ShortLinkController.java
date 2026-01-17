@@ -1,10 +1,10 @@
 package org.myproject.shortlink.admin.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.myproject.shortlink.admin.common.convention.result.Result;
 import org.myproject.shortlink.admin.common.convention.result.Results;
-import org.myproject.shortlink.admin.remote.ShortLinkRemoteService;
+import org.myproject.shortlink.admin.remote.ShortLinkActualRemoteService;
 import org.myproject.shortlink.admin.remote.dto.request.ShortLinkCreateReqDTO;
 import org.myproject.shortlink.admin.remote.dto.request.ShortLinkPageReqDTO;
 import org.myproject.shortlink.admin.remote.dto.request.ShortLinkUpdateReqDTO;
@@ -15,21 +15,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class ShortLinkController {
-    private final ShortLinkRemoteService shortLinkRemoteService;
+    private final ShortLinkActualRemoteService shortLinkActualRemoteService;
 
     @PostMapping("/api/short-link/admin/v1/create")
     public Result<ShortLinkCreateRespDTO> createShortLink (@RequestBody ShortLinkCreateReqDTO requestparam) {
-        return shortLinkRemoteService.createShortLink(requestparam);
+        return shortLinkActualRemoteService.createShortLink(requestparam);
     }
 
     @GetMapping("/api/short-link/admin/v1/page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink (ShortLinkPageReqDTO requestparam) {
-        return shortLinkRemoteService.pageShortLink(requestparam);
+    public Result<Page<ShortLinkPageRespDTO>> pageShortLink (ShortLinkPageReqDTO requestparam) {
+        return shortLinkActualRemoteService.pageShortLink(requestparam.getGid(), requestparam.getOrderTag(), requestparam.getCurrent(), requestparam.getSize());
     }
 
     @PutMapping(("/api/short-link/admin/v1/update"))
     public Result<Void> updateShortLink (@RequestBody ShortLinkUpdateReqDTO requestparam) {
-        shortLinkRemoteService.updateShortLink(requestparam);
+        shortLinkActualRemoteService.updateShortLink(requestparam);
         return Results.success();
     }
 }

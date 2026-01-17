@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.myproject.shortlink.project.dao.entity.LinkAccessLogsDO;
@@ -25,13 +26,21 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
     private final LinkStatsAccessRecordMapper linkStatsAccessRecordMapper;
 
     @Override
-    public IPage<ShortLinkStatsAccessRecordRespDTO> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+    public Page<ShortLinkStatsAccessRecordRespDTO> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
         LambdaQueryWrapper<LinkAccessLogsDO> wrapper = Wrappers.lambdaQuery(LinkAccessLogsDO.class)
                 .eq(LinkAccessLogsDO::getGid, requestParam.getGid())
                 .eq(LinkAccessLogsDO::getFullShortUrl, requestParam.getFullShortUrl())
                 .eq(LinkAccessLogsDO::getDelFlag, 0);
         IPage<LinkAccessLogsDO> LinkAccessLogsDOIPage = linkStatsAccessRecordMapper.selectPage(requestParam, wrapper);
-        IPage<ShortLinkStatsAccessRecordRespDTO> actualResult = LinkAccessLogsDOIPage.convert(each -> BeanUtil.toBean(each, ShortLinkStatsAccessRecordRespDTO.class));
+        IPage<ShortLinkStatsAccessRecordRespDTO> actualIpageResult = LinkAccessLogsDOIPage.convert(each -> BeanUtil.toBean(each, ShortLinkStatsAccessRecordRespDTO.class));
+
+        Page<ShortLinkStatsAccessRecordRespDTO> actualResult = new Page<>();
+        actualResult.setCurrent(actualIpageResult.getCurrent());
+        actualResult.setSize(actualIpageResult.getSize());
+        actualResult.setTotal(actualIpageResult.getTotal());
+        actualResult.setPages(actualIpageResult.getPages());
+        actualResult.setRecords(actualIpageResult.getRecords());
+
         List<String> userAccessLogsList = actualResult.getRecords()
                 .stream()
                 .map(ShortLinkStatsAccessRecordRespDTO::getUser)
@@ -50,12 +59,20 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
     }
 
     @Override
-    public IPage<ShortLinkStatsAccessRecordRespDTO> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+    public Page<ShortLinkStatsAccessRecordRespDTO> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
         LambdaQueryWrapper<LinkAccessLogsDO> wrapper = Wrappers.lambdaQuery(LinkAccessLogsDO.class)
                 .eq(LinkAccessLogsDO::getGid, requestParam.getGid())
                 .eq(LinkAccessLogsDO::getDelFlag, 0);
         IPage<LinkAccessLogsDO> LinkAccessLogsDOIPage = linkStatsAccessRecordMapper.selectPage(requestParam, wrapper);
-        IPage<ShortLinkStatsAccessRecordRespDTO> actualResult = LinkAccessLogsDOIPage.convert(each -> BeanUtil.toBean(each, ShortLinkStatsAccessRecordRespDTO.class));
+        IPage<ShortLinkStatsAccessRecordRespDTO> actualIpageResult = LinkAccessLogsDOIPage.convert(each -> BeanUtil.toBean(each, ShortLinkStatsAccessRecordRespDTO.class));
+
+        Page<ShortLinkStatsAccessRecordRespDTO> actualResult = new Page<>();
+        actualResult.setCurrent(actualIpageResult.getCurrent());
+        actualResult.setSize(actualIpageResult.getSize());
+        actualResult.setTotal(actualIpageResult.getTotal());
+        actualResult.setPages(actualIpageResult.getPages());
+        actualResult.setRecords(actualIpageResult.getRecords());
+
         List<String> userAccessLogsList = actualResult.getRecords()
                 .stream()
                 .map(ShortLinkStatsAccessRecordRespDTO::getUser)

@@ -1,6 +1,6 @@
 package org.myproject.shortlink.project.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class ShortLinkController {
     }
 
     @GetMapping("/api/short-link/project/v1/page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink (ShortLinkPageReqDTO requestparam) {
+    public Result<Page<ShortLinkPageRespDTO>> pageShortLink (ShortLinkPageReqDTO requestparam) {
         return Results.success(shortLinkService.pageShortLink(requestparam));
     }
 

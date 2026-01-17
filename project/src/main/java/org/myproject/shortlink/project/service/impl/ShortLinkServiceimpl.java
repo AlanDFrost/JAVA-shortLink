@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -50,6 +51,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static org.myproject.shortlink.project.common.constant.RedisKeyConstant.*;
 import static org.myproject.shortlink.project.common.constant.ShortLinkConstant.AMAP_RENOTE_URL;
@@ -117,15 +119,26 @@ public class ShortLinkServiceimpl extends ServiceImpl<ShortLinkMapper, ShortLink
     }
 
     @Override
-    public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestparam) {
+    public Page<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestparam) {
 //        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
 //                .eq(ShortLinkDO::getGid, requestparam.getGid())
 //                .eq(ShortLinkDO::getDelFlag, 0)
 //                .eq(ShortLinkDO::getEnableStatus, 0);
 //        IPage<ShortLinkDO> resultPage = baseMapper.selectPage(requestparam, queryWrapper);
-        IPage<ShortLinkDO> resultPage = shortLinkMapper.pageLink(requestparam);
+        IPage<ShortLinkDO> resultIPage = shortLinkMapper.pageLink(requestparam);
 
-        return resultPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
+        Page<ShortLinkPageRespDTO> resultPage = new Page<>();
+        resultPage.setCurrent(resultIPage.getCurrent());
+        resultPage.setSize(resultIPage.getSize());
+        resultPage.setTotal(resultIPage.getTotal());
+        resultPage.setPages(resultIPage.getPages());
+        resultPage.setRecords(
+                resultIPage.getRecords().stream()
+                        .map(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class))
+                        .collect(Collectors.toList())
+        );
+
+        return resultPage;
     }
 
     @Override

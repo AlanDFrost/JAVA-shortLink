@@ -1,6 +1,6 @@
 package org.myproject.shortlink.project.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.myproject.shortlink.project.dao.entity.ShortLinkDO;
 import org.myproject.shortlink.project.dto.request.RecycleBinRecoverReqDTO;
@@ -16,7 +16,7 @@ public interface RecycleBinService extends IService<ShortLinkDO> {
      */
     void saveRecycleBin(RecycleBinSaveReqDTO requestParam);
 
-    IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestparam);
+    Page<ShortLinkPageRespDTO> pageRecycleBin(ShortLinkPageReqDTO requestparam);
 
     /**
      * 恢复短链接

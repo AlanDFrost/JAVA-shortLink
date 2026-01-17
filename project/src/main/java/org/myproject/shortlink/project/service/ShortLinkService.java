@@ -1,6 +1,6 @@
 package org.myproject.shortlink.project.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -31,7 +31,7 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
     /*
     分页查询短链接请求参数
      */
-    IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestparam);
+    Page<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO requestparam);
 
     /*
     查询短链接分组内有多少条短链接
