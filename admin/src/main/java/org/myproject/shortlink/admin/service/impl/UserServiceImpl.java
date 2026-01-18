@@ -101,6 +101,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
          Boolean haslogin = stringRedisTemplate.hasKey("login_" + requestParam.getUsername());
          if (haslogin != null && haslogin) {
+             stringRedisTemplate.expire("login_" + requestParam.getUsername(), 30L, TimeUnit.DAYS);
              throw new ClientException("用户已登陆，请退出后重试");
          }
          String uuid = UUID.randomUUID().toString();
